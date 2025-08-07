@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEOW Z Language Playground</title>
+    <style>
+        
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            margin: 0; 
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        h1 {
+            color: #5a2d82; 
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .container { 
+            display: flex; 
+            flex-grow: 1; 
+            gap: 15px; 
+            margin-bottom: 15px;
+        }
+        textarea, pre { 
+            flex: 1; 
+            padding: 15px; 
+            border: 1px solid #ddd; 
+            border-radius: 8px;
+            font-size: 1em;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        textarea { 
+            resize: vertical; 
+            min-height: 200px;
+            background-color: #fff;
+            color: #000;
+        }
+        pre {
+            background-color: #e9e9e9;
+            overflow-y: auto; 
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        button { 
+            display: block;
+            width: 200px;
+            margin: 0 auto;
+            padding: 12px 25px; 
+            background-color: #7b4397;
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            font-size: 1.1em;
+            cursor: pointer; 
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #6a3a85;
+        }
+        .error { 
+            color: #d9534f;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>MEOW Z</h1>
+    <div class="container">
+        <textarea id="code-input" placeholder="Write your MEOW Z code here...">mwor i = 0 TO 5 purr
+    PRINT("meow")
+    PRINT("MEOW")
+END</textarea>
+        <pre id="output-display" class="output-area">Output will appear here...</pre>
+    </div>
+    <button onclick="runCode()">RUN</button>
+
+    <script>
+        async function runCode() {
+            const codeInput = document.getElementById('code-input').value;
+            const outputDisplay = document.getElementById('output-display');
+            
+            outputDisplay.textContent = 'Running...';
+            outputDisplay.classList.remove('error');
+
+            try {
+                const response = await fetch('/run_code', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ code: codeInput })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    outputDisplay.textContent = data.output + data.error;
+                    outputDisplay.classList.add('error');
+                } else {
+                    outputDisplay.textContent = data.output;
+                }
+            } catch (error) {
+                outputDisplay.textContent = `An unexpected error occurred: ${error}`;
+                outputDisplay.classList.add('error');
+            }
+        }
+    </script>
+</body>
+</html>
